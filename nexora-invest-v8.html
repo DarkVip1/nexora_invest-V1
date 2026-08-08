@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080d0c">
+<title>NEXORA INVEST V8</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#070b0a;color:#f4f7f6;font-family:Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}:root{--p:#0d1513;--l:#20302a;--g:#19d39b;--r:#ff5c70;--m:#82908b}
+.header{height:60px;background:#0b1210;border-bottom:1px solid var(--l);display:flex;align-items:center;padding:0 14px;position:sticky;top:0;z-index:20}.logo{font-size:20px;font-weight:900}.logo span{color:var(--g)}.badge{margin-left:auto;border:1px solid #2a3a34;padding:7px 10px;border-radius:18px;font-size:11px;color:#c8d0cd}.userpill{margin-left:8px;color:#9eaaa5;font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+main{max-width:1000px;margin:auto;padding:15px 13px 88px}.page{display:none}.page.active{display:block}h1{font-size:26px;margin:3px 0}.sub{color:var(--m);font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}.card,.panel{background:var(--p);border:1px solid var(--l);border-radius:15px}.card{padding:13px}.panel{padding:13px;margin:11px 0}.lab{font-size:10px;color:var(--m)}.val{font-size:20px;font-weight:900;margin-top:6px}.green{color:var(--g)}.red{color:var(--r)}
+.row{display:flex;justify-content:space-between;align-items:center}.chips{display:flex;gap:6px;overflow:auto}.chip{background:#17211e;border:1px solid #293731;color:#aeb8b4;border-radius:8px;padding:8px 11px;white-space:nowrap}.chip.active{background:#dffbf2;color:#061a12;font-weight:900}
+.chartbox{height:390px;margin-top:10px;position:relative;background:#080d0c;border:1px solid #1d2925;border-radius:10px;overflow:hidden}.chart{width:100%;height:100%;display:block}.charttext{position:absolute;top:9px;left:10px;font-size:11px;color:#7e8a86;pointer-events:none}.pricebadge{position:absolute;right:9px;top:9px;background:#101916;border:1px solid #293832;padding:5px 7px;border-radius:6px;font-size:11px;pointer-events:none}
+.quote{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #1c2824}.quote:last-child{border:0}.small{font-size:11px;color:var(--m);margin-top:3px}.right{text-align:right}
+.field{margin:9px 0}.field label{display:block;color:var(--m);font-size:11px;margin-bottom:5px}.field input{width:100%;padding:11px;border-radius:9px;border:1px solid #2a3933;background:#090e0d;color:white;outline:none}.btn{border:0;border-radius:9px;padding:12px;background:var(--g);color:#03160f;font-weight:900}.btn.red{background:var(--r);color:white}.btn.dark{background:#19231f;color:white}.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.wide{width:100%;margin-top:7px}
+table{width:100%;border-collapse:collapse;font-size:11px}th,td{text-align:left;padding:9px 3px;border-bottom:1px solid #1d2925}th{color:var(--m)}
+.progress{height:8px;background:#1b2823;border-radius:20px;overflow:hidden;margin:12px 0}.progress i{display:block;height:100%;width:0;background:var(--g)}
+.nav{height:68px;position:fixed;bottom:0;left:0;right:0;background:#0a1210;border-top:1px solid var(--l);display:flex;z-index:30}.nav button{flex:1;border:0;background:transparent;color:#788580;font-size:10px}.nav strong{display:block;font-size:20px;line-height:24px}.nav .active{color:var(--g)}
+.footer{text-align:center;color:#697671;font-size:11px;line-height:18px;margin:25px 0}.footer b{color:#c3cbc8}.footer a{color:var(--g);text-decoration:none}
+.modal{display:none;position:fixed;inset:0;background:#000b;z-index:50;align-items:flex-end}.modal.show{display:flex}.sheet{width:100%;background:#101916;border-radius:19px 19px 0 0;padding:18px;border-top:1px solid #2b3d35}.close{float:right;background:none;border:0;color:#fff;font-size:26px}
+.toast{display:none;position:fixed;bottom:78px;left:50%;transform:translateX(-50%);background:#17251f;border:1px solid #315447;padding:9px 13px;border-radius:9px;font-size:11px;z-index:70}.toast.show{display:block}
+.auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at top,#10251d,#070b0a 55%)}.authbox{width:100%;max-width:430px;background:#0d1513;border:1px solid #20302a;border-radius:20px;padding:24px;box-shadow:0 20px 60px #0008}.authlogo{font-size:28px;font-weight:900}.authlogo span{color:var(--g)}.authbox h1{font-size:22px;margin-top:24px}.linkbtn{background:none;border:0;color:var(--g);padding:8px}.error{color:#ff8b98;font-size:12px;min-height:18px;margin-top:8px}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}.modal{align-items:center;justify-content:center}.sheet{max-width:420px;border-radius:18px}}
+</style>
+</head>
+<body>
+
+<div id="auth" class="auth">
+<div class="authbox">
+<div class="authlogo">NEXORA <span>INVEST</span></div>
+<div class="sub">Virtual trading platform</div>
+<h1 id="authTitle">Masuk</h1>
+<div class="field"><label>Email</label><input id="authEmail" type="email" placeholder="email@contoh.com" autocomplete="email"></div>
+<div class="field"><label>Password</label><input id="authPass" type="password" placeholder="Minimal 6 karakter" autocomplete="current-password"></div>
+<div class="field" id="nameField" style="display:none"><label>Nama</label><input id="authName" type="text" placeholder="Nama kamu"></div>
+<button class="btn wide" id="authSubmit">MASUK</button>
+<button class="linkbtn wide" id="authSwitch">Belum punya akun? Daftar</button>
+<div class="error" id="authError"></div>
+<div class="small">Saldo dan trading di situs ini bersifat virtual.</div>
+</div>
+</div>
+
+<div id="app" style="display:none">
+<header class="header"><div class="logo">NEXORA <span>INVEST</span></div><div class="badge">VIRTUAL TRADING</div><div class="userpill" id="userEmail"></div></header>
+<main>
+
+<section id="home" class="page active">
+<h1>Dashboard</h1><div class="sub">Market overview</div>
+<div class="grid"><div class="card"><div class="lab">Cash</div><div class="val" id="cash">Rp100.000.000</div></div><div class="card"><div class="lab">Portfolio</div><div class="val" id="pv">Rp0</div></div><div class="card"><div class="lab">P/L</div><div class="val green" id="pl">Rp0</div></div><div class="card"><div class="lab">Savings</div><div class="val" id="sv">Rp0</div></div></div>
+<div class="panel"><div class="row"><b id="homeSym">BBCA</b><span class="green" id="homePx">Rp8.500</span></div><div class="chartbox"><canvas id="homeChart" class="chart"></canvas><div class="charttext">NEXORA MARKET</div><div class="pricebadge">SIMULATED</div></div></div>
+<div class="panel"><div class="row"><b>Watchlist</b><span class="sub">IDX</span></div><div id="homeList"></div></div>
+</section>
+
+<section id="market" class="page">
+<h1>Markets</h1><div class="sub">Interactive simulated market</div>
+<div class="panel"><div class="chips" id="stocks"></div><div class="chips" id="times" style="margin-top:8px"></div><div class="chartbox"><canvas id="marketChart" class="chart"></canvas><div class="charttext">NEXORA MARKET</div><div class="pricebadge" id="marketPx">Rp8.500</div></div></div>
+<div class="panel"><div id="marketList"></div></div>
+</section>
+
+<section id="trade" class="page">
+<h1>Trade</h1><div class="sub">Virtual order terminal</div>
+<div class="panel"><div class="row"><div><b id="tradeSym">BBCA</b><div class="small" id="tradeName">Bank Central Asia</div></div><b id="tradePx">Rp8.500</b></div>
+<div class="field"><label>Quantity (lot)</label><input id="lots" type="number" min="1" value="1"></div>
+<div class="card"><div class="lab">Estimated Value</div><div class="val" id="estimate">Rp850.000</div></div>
+<div class="two"><button class="btn" id="buy">BUY</button><button class="btn red" id="sell">SELL</button></div></div>
+<div class="panel"><div class="row"><b>Available Cash</b><b id="tcash">Rp100.000.000</b></div></div>
+</section>
+
+<section id="portfolio" class="page">
+<h1>Portfolio</h1><div class="sub">Open positions</div>
+<div class="grid"><div class="card"><div class="lab">Market Value</div><div class="val" id="mval">Rp0</div></div><div class="card"><div class="lab">Invested</div><div class="val" id="cost">Rp0</div></div><div class="card"><div class="lab">P/L</div><div class="val" id="pnl">Rp0</div></div><div class="card"><div class="lab">Positions</div><div class="val" id="cnt">0</div></div></div>
+<div class="panel"><table><thead><tr><th>Asset</th><th>Qty</th><th>Avg</th><th>P/L</th></tr></thead><tbody id="ptable"></tbody></table></div>
+</section>
+
+<section id="saving" class="page">
+<h1>Savings</h1><div class="sub">Virtual savings</div>
+<div class="panel"><div class="lab">Savings Balance</div><div class="val" id="save">Rp0</div><div class="progress"><i id="bar"></i></div><div class="sub">Target <b id="targetText">Rp10.000.000</b></div></div>
+<div class="panel"><div class="field"><label>Deposit</label><input id="dep" type="number" placeholder="1000000"></div><button class="btn wide" id="depBtn">DEPOSIT</button></div>
+<div class="panel"><div class="field"><label>Target</label><input id="tar" type="number" placeholder="10000000"></div><button class="btn dark wide" id="tarBtn">UPDATE TARGET</button></div>
+</section>
+
+<section id="activity" class="page">
+<h1>Activity</h1><div class="sub">Order history</div>
+<div class="panel"><table><thead><tr><th>Time</th><th>Type</th><th>Asset</th><th>Value</th></tr></thead><tbody id="hist"></tbody></table></div>
+<div class="panel"><button class="btn dark wide" id="signout">SIGN OUT</button><button class="btn red wide" id="reset">RESET ACCOUNT</button></div>
+</section>
+
+<div class="footer">NEXORA INVEST<br><b>Pemilik: Bagas Arifin Ilham</b><br><a href="https://instagram.com/gaszz_welll" target="_blank">@gaszz_welll</a></div>
+</main>
+<nav class="nav"><button class="active" data-page="home"><strong>⌂</strong>Home</button><button data-page="market"><strong>▥</strong>Market</button><button data-page="trade"><strong>ϟ</strong>Trade</button><button data-page="portfolio"><strong>▣</strong>Portfolio</button><button data-page="saving"><strong>♜</strong>Saving</button><button data-page="activity"><strong>☰</strong>More</button></nav>
+</div>
+
+<div class="modal" id="modal"><div class="sheet"><button class="close" id="close">×</button><h2 id="modalTitle">BUY BBCA</h2><div class="sub" id="modalSub"></div><div class="card" style="margin-top:12px"><div class="lab">Order Value</div><div class="val" id="modalVal">Rp0</div></div><button class="btn wide" id="confirm">CONFIRM ORDER</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================
+   SUPABASE CONFIGURATION
+   1. Buka Supabase > Project Settings > API
+   2. Salin Project URL
+   3. Salin Publishable key (atau anon key pada dashboard lama)
+   4. Tempel di dua variabel berikut.
+   JANGAN masukkan service_role/secret key.
+================================ */
+const SUPABASE_URL="GANTI_DENGAN_PROJECT_URL";
+const SUPABASE_KEY="GANTI_DENGAN_PUBLISHABLE_KEY";
+let sb=null;
+if(window.supabase && !SUPABASE_URL.startsWith("GANTI_") && !SUPABASE_KEY.startsWith("GANTI_")){
+ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+}
+
+const DATA={
+ BBCA:{name:"Bank Central Asia",p:8500},
+ BBRI:{name:"Bank Rakyat Indonesia",p:4650},
+ BMRI:{name:"Bank Mandiri",p:5600},
+ TLKM:{name:"Telkom Indonesia",p:2900},
+ ASII:{name:"Astra International",p:4800},
+ GOTO:{name:"GoTo Gojek Tokopedia",p:70}
+};
+const TIMES=["1m","5m","15m","30m","1h","4h","1D"];
+const KEY="nexora_v8_local";
+let state={cash:100000000,saving:0,target:10000000,sym:"BBCA",time:"1m",pos:{},hist:[]};
+let series={},side="BUY",authMode="login",user=null;
+const $=id=>document.getElementById(id);
+
+function rp(n){return "Rp"+Math.round(n).toLocaleString("id-ID")}
+function localSave(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
+function localLoad(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x)state={...state,...x}}catch(e){}}
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(window._toast);window._toast=setTimeout(()=>e.classList.remove("show"),1800)}
+function calcPort(){let v=0,c=0,n=0;for(const k in state.pos){const a=state.pos[k];v+=a.qty*DATA[k].p;c+=a.cost;n++}return{v,c,pl:v-c,n}}
+function addHist(type,k,v){state.hist.unshift({t:new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}),type,k,v})}
+
+async function saveCloud(){
+ if(!sb||!user)return;
+ try{
+  const {error}=await sb.from("profiles").upsert({
+   id:user.id,email:user.email,balance:state.cash,saving:state.saving,
+   target:state.target,updated_at:new Date().toISOString()
+  });
+  if(error)console.warn("Cloud save:",error.message);
+ }catch(e){console.warn(e)}
+}
+async function loadCloud(){
+ if(!sb||!user){localLoad();return}
+ try{
+  const {data,error}=await sb.from("profiles").select("*").eq("id",user.id).maybeSingle();
+  if(error)throw error;
+  if(data){
+   state={...state,cash:Number(data.balance??state.cash),saving:Number(data.saving??0),target:Number(data.target??10000000)}
+  }else await saveCloud();
+ }catch(e){
+  localLoad();
+  console.warn("Database belum siap:",e.message);
+ }
+}
+function showAuth(msg){
+ $("auth").style.display="flex";$("app").style.display="none";$("authError").textContent=msg||"";
+}
+function toggleAuth(){
+ authMode=authMode==="login"?"register":"login";
+ $("authTitle").textContent=authMode==="login"?"Masuk":"Daftar";
+ $("authSubmit").textContent=authMode==="login"?"MASUK":"BUAT AKUN";
+ $("authSwitch").textContent=authMode==="login"?"Belum punya akun? Daftar":"Sudah punya akun? Masuk";
+ $("nameField").style.display=authMode==="register"?"block":"none";
+ $("authError").textContent="";
+}
+async function signIn(){
+ if(!sb){showAuth("Supabase belum dikonfigurasi.");return}
+ const email=$("authEmail").value.trim(),password=$("authPass").value;
+ if(!email||password.length<6){showAuth("Email valid dan password minimal 6 karakter.");return}
+ const {data,error}=await sb.auth.signInWithPassword({email,password});
+ if(error){showAuth(error.message);return}
+ user=data.user;await startApp();
+}
+async function signUp(){
+ if(!sb){showAuth("Supabase belum dikonfigurasi.");return}
+ const email=$("authEmail").value.trim(),password=$("authPass").value,name=$("authName").value.trim();
+ if(!email||password.length<6){showAuth("Email valid dan password minimal 6 karakter.");return}
+ const {data,error}=await sb.auth.signUp({email,password,options:{data:{name}}});
+ if(error){showAuth(error.message);return}
+ if(data.session){user=data.user;await startApp()}
+ else showAuth("Akun dibuat. Cek email verifikasi jika diminta, lalu masuk.");
+}
+async function authRefresh(){
+ if(!sb){showAuth("Masukkan Project URL + Publishable key Supabase pada bagian CONFIG di kode.");return}
+ const {data}=await sb.auth.getSession();
+ if(data.session){user=data.session.user;await startApp()}else showAuth("");
+}
+async function startApp(){
+ $("auth").style.display="none";$("app").style.display="block";
+ $("userEmail").textContent=user?.email||"";
+ await loadCloud();render();show("home");
+}
+async function doSignOut(){
+ if(sb)await sb.auth.signOut();
+ user=null;
+ $("app").style.display="none";$("auth").style.display="flex";
+ showAuth("");toast("Berhasil keluar");
+}
+function persist(){localSave();saveCloud()}
+
+function seed(k){
+ let a=[],x=DATA[k].p,s=0;
+ for(const c of k)s+=c.charCodeAt(0);
+ for(let i=0;i<100;i++){s=(s*9301+49297)%233280;x*=1+((s/233280)-.5)*.012;a.push(x)}
+ return a;
+}
+function getSeries(k){if(!series[k])series[k]=seed(k);return series[k]}
+function tick(){
+ for(const k in DATA){
+  const a=getSeries(k),last=a[a.length-1];
+  a.push(Math.max(1,last*(1+(Math.random()-.5)*.012)));
+  if(a.length>100)a.shift();
+  DATA[k].p=a[a.length-1];
+ }
+ drawAll();renderText();
+}
+function draw(id,k){
+ const c=$(id);if(!c)return;
+ const ctx=c.getContext("2d"),dpr=window.devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;
+ if(!w||!h)return;
+ if(c.width!==Math.floor(w*dpr)||c.height!==Math.floor(h*dpr)){c.width=Math.floor(w*dpr);c.height=Math.floor(h*dpr)}
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ ctx.fillStyle="#080d0c";ctx.fillRect(0,0,w,h);
+ const a=getSeries(k),min=Math.min(...a),max=Math.max(...a),pad=30;
+ ctx.strokeStyle="#17221f";ctx.lineWidth=1;
+ for(let i=0;i<6;i++){const y=pad+i*(h-pad*1.5)/5;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+ const pts=a.map((v,i)=>[10+i*(w-20)/(a.length-1),pad+(max-v)/(max-min||1)*(h-pad*1.7)]);
+ ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));
+ ctx.strokeStyle="#19d39b";ctx.lineWidth=2.5;ctx.stroke();
+ const p=pts[pts.length-1];ctx.fillStyle="#19d39b";ctx.beginPath();ctx.arc(p[0],p[1],4,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle="#77837f";ctx.font="10px Arial";ctx.fillText("NEXORA • "+state.time,10,h-9);
+}
+function drawAll(){draw("homeChart",state.sym);draw("marketChart",state.sym)}
+function renderLists(){
+ let h="",m="",s="";
+ Object.keys(DATA).forEach(k=>{
+  const d=DATA[k],a=getSeries(k),chg=(d.p/a[0]-1)*100,cl=chg>=0?"green":"red";
+  s+='<button type="button" class="chip '+(k===state.sym?"active":"")+'" data-stock="'+k+'">'+k+'</button>';
+  const q='<button type="button" class="quote" data-stock="'+k+'" style="display:flex;width:100%;background:none;color:inherit;border:0;text-align:left"><span><b>'+k+'</b><span class="small" style="display:block">'+d.name+'</span></span><span class="right"><b>'+rp(d.p)+'</b><span class="'+cl+' small" style="display:block">'+(chg>=0?"+":"")+chg.toFixed(2)+'%</span></span></button>';
+  h+=q;m+=q;
+ });
+ $("homeList").innerHTML=h;$("marketList").innerHTML=m;$("stocks").innerHTML=s;
+ document.querySelectorAll("[data-stock]").forEach(e=>e.addEventListener("click",()=>selectStock(e.dataset.stock)));
+}
+function renderTimes(){
+ let x="";
+ TIMES.forEach(t=>x+='<button type="button" class="chip '+(state.time===t?"active":"")+'" data-time="'+t+'">'+t+'</button>');
+ $("times").innerHTML=x;
+ document.querySelectorAll("[data-time]").forEach(e=>e.addEventListener("click",()=>{state.time=e.dataset.time;persist();render()}));
+}
+function selectStock(k){state.sym=k;persist();render();show("market")}
+function show(id){
+ document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+ const p=$(id);if(p)p.classList.add("active");
+ document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===id));
+ drawAll();
+}
+function renderText(){
+ const d=DATA[state.sym],p=calcPort();
+ $("cash").textContent=rp(state.cash);$("pv").textContent=rp(p.v);$("pl").textContent=rp(p.pl);$("sv").textContent=rp(state.saving);
+ $("homeSym").textContent=state.sym;$("homePx").textContent=rp(d.p);
+ $("tradeSym").textContent=state.sym;$("tradeName").textContent=d.name;$("tradePx").textContent=rp(d.p);$("tcash").textContent=rp(state.cash);
+ $("save").textContent=rp(state.saving);$("targetText").textContent=rp(state.target);
+ $("bar").style.width=Math.min(100,state.target?state.saving/state.target*100:0)+"%";
+ const lots=Math.max(1,Number($("lots").value)||1);
+ $("estimate").textContent=rp(lots*100*d.p);$("marketPx").textContent=rp(d.p);
+ $("mval").textContent=rp(p.v);$("cost").textContent=rp(p.c);$("pnl").textContent=rp(p.pl);$("cnt").textContent=p.n;
+ let rows="";
+ Object.keys(state.pos).forEach(k=>{
+  const a=state.pos[k],v=a.qty*DATA[k].p,z=v-a.cost;
+  rows+='<tr><td><b>'+k+'</b></td><td>'+a.qty/100+'</td><td>'+rp(a.cost/a.qty)+'</td><td class="'+(z>=0?"green":"red")+'">'+rp(z)+'</td></tr>';
+ });
+ $("ptable").innerHTML=rows||'<tr><td colspan="4" class="small">Belum ada posisi</td></tr>';
+ $("hist").innerHTML=state.hist.map(x=>'<tr><td>'+x.t+'</td><td>'+x.type+'</td><td>'+x.k+'</td><td>'+rp(x.v)+'</td></tr>').join("")||'<tr><td colspan="4" class="small">Belum ada aktivitas</td></tr>';
+}
+function render(){renderText();renderLists();renderTimes();drawAll()}
+function openOrder(s){
+ side=s;
+ const lots=Math.max(1,Number($("lots").value)||1);
+ $("modalTitle").textContent=s+" "+state.sym;
+ $("modalSub").textContent=lots+" lot • "+state.sym;
+ $("modalVal").textContent=rp(lots*100*DATA[state.sym].p);
+ $("modal").classList.add("show");
+}
+function confirmOrder(){
+ const lots=Math.max(1,Number($("lots").value)||1),qty=lots*100,total=qty*DATA[state.sym].p,k=state.sym;
+ let a=state.pos[k]||{qty:0,cost:0};
+ if(side==="BUY"){
+  if(total>state.cash){toast("Saldo tidak cukup");return}
+  state.cash-=total;a.qty+=qty;a.cost+=total;state.pos[k]=a;addHist("BUY",k,total);
+ }else{
+  if(qty>a.qty){toast("Posisi tidak cukup");return}
+  const avg=a.cost/a.qty;state.cash+=total;a.qty-=qty;a.cost-=avg*qty;
+  if(a.qty)state.pos[k]=a;else delete state.pos[k];
+  addHist("SELL",k,total);
+ }
+ persist();$("modal").classList.remove("show");render();toast("Order berhasil");
+}
+function deposit(){
+ const n=Number($("dep").value);
+ if(!Number.isFinite(n)||n<=0||n>state.cash){toast("Nominal tidak valid");return}
+ state.cash-=n;state.saving+=n;addHist("SAVE","Deposit",n);$("dep").value="";persist();render();toast("Tabungan bertambah");
+}
+function target(){
+ const n=Number($("tar").value);
+ if(!Number.isFinite(n)||n<=0){toast("Target tidak valid");return}
+ state.target=n;$("tar").value="";persist();render();toast("Target diperbarui");
+}
+function resetAccount(){
+ if(confirm("Reset semua data NEXORA INVEST?")){
+  state={cash:100000000,saving:0,target:10000000,sym:"BBCA",time:"1m",pos:{},hist:[]};
+  series={};persist();render();toast("Akun direset");
+ }
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+ $("authSwitch").addEventListener("click",toggleAuth);
+ $("authSubmit").addEventListener("click",()=>authMode==="login"?signIn():signUp());
+ $("authPass").addEventListener("keydown",e=>{if(e.key==="Enter")$("authSubmit").click()});
+ document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.page)));
+ $("lots").addEventListener("input",renderText);
+ $("buy").addEventListener("click",()=>openOrder("BUY"));
+ $("sell").addEventListener("click",()=>openOrder("SELL"));
+ $("close").addEventListener("click",()=>$("modal").classList.remove("show"));
+ $("confirm").addEventListener("click",confirmOrder);
+ $("depBtn").addEventListener("click",deposit);
+ $("tarBtn").addEventListener("click",target);
+ $("reset").addEventListener("click",resetAccount);
+ $("signout").addEventListener("click",doSignOut);
+ window.addEventListener("resize",drawAll);
+ setInterval(tick,1800);
+ authRefresh();
+});
+</script>
+</body>
+</html>
